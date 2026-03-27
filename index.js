@@ -20,11 +20,13 @@ client.once('clientReady', () => {
 });
 
 client.on('messageCreate', async (message) => {
+  console.log("受信:", message.content, "チャンネル:", message.channel.id);
   // Botは無視
   if (message.author.bot) return;
 
   // チャンネルチェック
   if (message.channel.id !== TARGET_CHANNEL_ID) return;
+  console.log("対象チャンネル一致");
 
   const member = message.member;
   if (!member) return;
@@ -44,7 +46,6 @@ client.on('messageCreate', async (message) => {
 
   console.log(`${member.user.tag} にロール付与`);
 });
-
 
 // 簡易Webサーバーのやつ
 // Botログイン
