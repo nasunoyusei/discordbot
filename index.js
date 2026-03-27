@@ -1,6 +1,7 @@
 const { Client, GatewayIntentBits } = require('discord.js');
 require('dotenv').config();
 
+//ロールを自動付与するやつ
 const client = new Client({
   intents: [
     GatewayIntentBits.Guilds,
@@ -13,7 +14,7 @@ const client = new Client({
 const TARGET_CHANNEL_ID = "1487034879005954179";
 const ROLE_NAME = "マイマイ";
 
-client.once('ready', () => {
+client.once('clientReady', () => {
   console.log(`ログイン完了: ${client.user.tag}`);
 });
 
@@ -43,4 +44,19 @@ client.on('messageCreate', async (message) => {
   console.log(`${member.user.tag} にロール付与`);
 });
 
+
+// 簡易Webサーバーのやつ
+// Botログイン
 client.login(process.env.TOKEN);
+
+const express = require('express');
+const app = express();
+
+app.get('/', (req, res) => {
+  res.send('Bot is alive!');
+});
+
+const PORT = process.env.PORT || 3000;
+app.listen(PORT, () => {
+  console.log('Web server is running');
+});
