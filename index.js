@@ -11,7 +11,8 @@ const client = new Client({
   ]
 });
 
-const TARGET_CHANNEL_ID = "1487034879005954179";
+//書き込みを検知するチャンネル
+const TARGET_CHANNEL_ID = "1075660949714907166";
 const ROLE_NAME = "マイマイ";
 
 client.once('clientReady', () => {
