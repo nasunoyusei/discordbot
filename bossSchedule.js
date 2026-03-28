@@ -40,12 +40,22 @@ function buildMessage(data) {
   for (const d of data.dates) {
     const count = d.participants.length;
     const status = count >= data.max ? "✅" : "❌";
+
+    const names = d.participants.map((id) => `<@${id}>`).join(", ");
+
     text += `${d.label} ${status}（${count}/${data.max}）\n`;
+    if (names) {
+      text += `　👥 ${names}\n`;
+    }
   }
 
   // 次回開催日表示
   if (data.confirmedDates.length > 0) {
-    const next = data.confirmedDates[data.currentIndex];
+    const sortedConfirmed = [...data.confirmedDates].sort(
+      (a, b) => new Date(a) - new Date(b),
+    );
+
+    const next = sortedConfirmed[data.currentIndex];
     const nextObj = data.dates.find((d) => d.key === next);
 
     if (nextObj) {
@@ -57,6 +67,7 @@ function buildMessage(data) {
   if (data.confirmedDates.length > data.currentIndex + 1) {
     const reserve = data.confirmedDates
       .slice(data.currentIndex + 1)
+      .sort((a, b) => new Date(a) - new Date(b))
       .map((d) => {
         const obj = data.dates.find((x) => x.key === d);
         return obj ? obj.label : null;
@@ -71,16 +82,20 @@ function buildMessage(data) {
 }
 
 // ボタン生成
-function buildButtons(days) {
+function buildButtons(days, schedule, userId) {
   const rows = [];
   let row = new ActionRowBuilder();
 
   days.forEach((d, i) => {
+    const date = schedule.dates.find((x) => x.key === d.key);
+
+    const isSelected = date.participants.includes(userId);
+
     row.addComponents(
       new ButtonBuilder()
         .setCustomId(d.key)
         .setLabel(d.label)
-        .setStyle(ButtonStyle.Primary),
+        .setStyle(isSelected ? ButtonStyle.Success : ButtonStyle.Secondary),
     );
 
     if ((i + 1) % 5 === 0) {
@@ -148,11 +163,11 @@ function setupBossSchedule(client) {
 
           const message = await interaction.reply({
             content: buildMessage(schedule),
-            components: buildButtons(days),
-            fetchReply: true,
+            components: buildButtons(days, schedule, interaction.user.id),
           });
 
-          schedule.messageId = message.id;
+          const fetched = await interaction.fetchReply();
+          schedule.messageId = fetched.id;
 
           const data = load();
           const key = `${interaction.guild.id}_${interaction.channel.id}`;
@@ -187,10 +202,21 @@ function setupBossSchedule(client) {
         schedule.confirmedDates.push(date.key);
       }
 
+      // 全日付を再チェック
+      schedule.confirmedDates = schedule.dates
+        .filter((d) => d.participants.length >= schedule.max)
+        .map((d) => d.key);
+
+      // currentIndex補正
+      if (schedule.currentIndex >= schedule.confirmedDates.length) {
+        schedule.currentIndex = 0;
+      }
+
       save(data);
 
       await interaction.update({
         content: buildMessage(schedule),
+        components: buildButtons(schedule.dates, schedule, interaction.user.id),
       });
     }
   });
