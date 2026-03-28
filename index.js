@@ -1,7 +1,10 @@
 const { Client, GatewayIntentBits } = require('discord.js');
 require('dotenv').config();
 
-//ロールを自動付与するやつ
+const { startScheduler } = require('./scheduler');
+const { setupRoleHandler } = require('./roleHandler');
+const { setupBossSchedule } = require('./bossSchedule');
+
 const client = new Client({
   intents: [
     GatewayIntentBits.Guilds,
@@ -11,46 +14,17 @@ const client = new Client({
   ]
 });
 
-//書き込みを検知するチャンネル
-const TARGET_CHANNEL_ID = "1075660949714907166";
-const ROLE_NAME = "マイマイ";
-
 client.once('clientReady', () => {
   console.log(`ログイン完了: ${client.user.tag}`);
+
+  startScheduler(client);
+  setupRoleHandler(client);
+  setupBossSchedule(client);
 });
 
-client.on('messageCreate', async (message) => {
-  console.log("受信:", message.content, "チャンネル:", message.channel.id);
-  // Botは無視
-  if (message.author.bot) return;
-
-  // チャンネルチェック
-  if (message.channel.id !== TARGET_CHANNEL_ID) return;
-  console.log("対象チャンネル一致");
-
-  const member = message.member;
-  if (!member) return;
-
-  // ロール取得
-  const role = message.guild.roles.cache.find(r => r.name === ROLE_NAME);
-  if (!role) {
-    console.log("ロールが見つからない");
-    return;
-  }
-
-  // すでに持ってたら何もしない
-  if (member.roles.cache.has(role.id)) return;
-
-  // ロール付与
-  await member.roles.add(role);
-
-  console.log(`${member.user.tag} にロール付与`);
-});
-
-// 簡易Webサーバーのやつ
-// Botログイン
 client.login(process.env.TOKEN);
 
+// UptimeRobotから定期的にアクセスさせてスリープ防止するためのWebサーバー
 const express = require('express');
 const app = express();
 
