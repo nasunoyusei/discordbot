@@ -136,6 +136,7 @@ function setupBossSchedule(client) {
       if (interaction.commandName === "boss") {
         const sub = interaction.options.getSubcommand();
 
+        // scheduleのコマンド
         if (sub === "schedule") {
           const max = interaction.options.getInteger("人数");
           const startOption = interaction.options.getString("開始");
@@ -169,6 +170,59 @@ function setupBossSchedule(client) {
           data[key] = schedule;
           save(data);
         }
+
+        // rescheduleのコマンド
+        if (sub === "reschedule") {
+          const data = load();
+          const key = `${interaction.guild.id}_${interaction.channel.id}`;
+          const schedule = data[key];
+
+          if (!schedule) {
+            return interaction.reply({
+              content: "スケジュールが存在しません",
+              ephemeral: true,
+            });
+          }
+
+          // 次の開催日に進む
+          const sorted = [...schedule.confirmedDates].sort(
+            (a, b) => new Date(a) - new Date(b),
+          );
+
+          if (schedule.currentIndex + 1 < sorted.length) {
+            schedule.currentIndex++;
+            schedule.confirmedDates = sorted;
+            schedule.notified = false;
+
+            save(data);
+
+            let message;
+            try {
+              const channel = await client.channels.fetch(schedule.channelId);
+              message = await channel.messages.fetch(schedule.messageId);
+            } catch (e) {
+              return interaction.reply({
+                content: "元メッセージが見つかりません",
+                ephemeral: true,
+              });
+            }
+
+            await message.edit({
+              content: buildMessage(schedule),
+              components: buildButtons(schedule.dates),
+            });
+
+            return interaction.reply({
+              content: "次の開催日に変更しました",
+              ephemeral: true,
+            });
+          } else {
+            return interaction.reply({
+              content: "これ以上先の候補日がありません",
+              ephemeral: true,
+            });
+          }
+        }
       }
     }
 
@@ -197,6 +251,29 @@ function setupBossSchedule(client) {
       schedule.confirmedDates = schedule.dates
         .filter((d) => d.participants.length >= schedule.max)
         .map((d) => d.key);
+
+      // 再計算後
+      const sorted = [...schedule.confirmedDates].sort(
+        (a, b) => new Date(a) - new Date(b),
+      );
+
+      const targetDate = sorted[schedule.currentIndex];
+
+      // 今日じゃなくてもOK（テスト用）
+      if (targetDate) {
+        const dateObj = schedule.dates.find((d) => d.key === targetDate);
+
+        if (dateObj && dateObj.participants.length >= schedule.max) {
+          const mentions = dateObj.participants
+            .map((id) => `<@${id}>`)
+            .join(" ");
+
+          // テスト用通知
+          await interaction.channel.send(
+            `🧪【テスト通知】開催日が確定しました！\n${dateObj.label}\n${mentions}`,
+          );
+        }
+      }
 
       // currentIndex補正
       if (schedule.currentIndex >= schedule.confirmedDates.length) {

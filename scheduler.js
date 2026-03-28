@@ -1,7 +1,7 @@
-const cron = require('node-cron');
-const fs = require('fs');
+const cron = require("node-cron");
+const fs = require("fs");
 
-const FILE = './schedule.json';
+const FILE = "./schedule.json";
 
 function loadData() {
   if (!fs.existsSync(FILE)) return {};
@@ -13,42 +13,56 @@ function saveData(data) {
 }
 
 function startScheduler(client) {
-  cron.schedule('0 12 * * *', async () => {
-    console.log("12時チェック開始");
+  cron.schedule(
+    "0 12 * * *",
+    async () => {
+      console.log("12時チェック開始");
 
-    const data = loadData();
-    const today = new Date().toLocaleDateString('sv-SE');
+      const data = loadData();
+      const today = new Date().toLocaleDateString("sv-SE");
 
-    for (const key in data) {
-      const schedule = data[key];
+      for (const key in data) {
+        const schedule = data[key];
 
-      // 現在の対象日
-      const targetDate = schedule.confirmedDates[schedule.currentIndex];
-      if (!targetDate) continue;
+        // 現在の対象日
+        const sorted = [...schedule.confirmedDates].sort(
+          (a, b) => new Date(a) - new Date(b),
+        );
 
-      // 今日じゃないならスキップ
-      if (today !== targetDate) continue;
+        const targetDate = sorted[schedule.currentIndex];
+        if (!targetDate) continue;
 
-      // すでに通知済みならスキップ
-      if (schedule.notified) continue;
+        // 今日じゃないならスキップ
+        if (today !== targetDate) continue;
 
-      try {
-        const channel = await client.channels.fetch(schedule.channelId);
-        if (!channel) continue;
+        // すでに通知済みならスキップ
+        if (schedule.notified) continue;
 
-        await channel.send("📢 今日はボスの日です！忘れずに参加してね！");
+        const dateObj = schedule.dates.find((d) => d.key === targetDate);
+        if (!dateObj || dateObj.participants.length === 0) continue;
 
-        schedule.notified = true;
-        console.log(`通知完了: ${schedule.channelId}`);
-      } catch (err) {
-        console.error("通知失敗:", err);
+        const mentions = dateObj.participants.map((id) => `<@${id}>`).join(" ");
+
+        try {
+          const channel = await client.channels.fetch(schedule.channelId);
+          if (!channel) continue;
+
+          await channel.send(`🐌📢 今日はボスの日です！\n${mentions}`);
+
+          schedule.notified = true;
+
+          console.log(`通知完了: ${schedule.channelId} / ${targetDate}`);
+        } catch (err) {
+          console.error("通知失敗:", err);
+        }
       }
-    }
 
-    saveData(data);
-  }, {
-    timezone: "Asia/Tokyo"
-  });
+      saveData(data);
+    },
+    {
+      timezone: "Asia/Tokyo",
+    },
+  );
 }
 
 module.exports = { startScheduler };
