@@ -252,8 +252,6 @@ function setupBossSchedule(client) {
         .filter((d) => d.participants.length >= schedule.max)
         .map((d) => d.key);
 
-      }
-
       // currentIndex補正
       if (schedule.currentIndex >= schedule.confirmedDates.length) {
         schedule.currentIndex = 0;
