@@ -82,20 +82,16 @@ function buildMessage(data) {
 }
 
 // ボタン生成
-function buildButtons(days, schedule, userId) {
+function buildButtons(days) {
   const rows = [];
   let row = new ActionRowBuilder();
 
   days.forEach((d, i) => {
-    const date = schedule.dates.find((x) => x.key === d.key);
-
-    const isSelected = date.participants.includes(userId);
-
     row.addComponents(
       new ButtonBuilder()
         .setCustomId(d.key)
         .setLabel(d.label)
-        .setStyle(isSelected ? ButtonStyle.Success : ButtonStyle.Secondary),
+        .setStyle(ButtonStyle.Primary),
     );
 
     if ((i + 1) % 5 === 0) {
@@ -154,7 +150,6 @@ function setupBossSchedule(client) {
               key: d.key,
               label: d.label,
               participants: [],
-              confirmed: false,
             })),
             confirmedDates: [],
             currentIndex: 0,
@@ -163,7 +158,7 @@ function setupBossSchedule(client) {
 
           const message = await interaction.reply({
             content: buildMessage(schedule),
-            components: buildButtons(days, schedule, interaction.user.id),
+            components: buildButtons(days),
           });
 
           const fetched = await interaction.fetchReply();
@@ -193,13 +188,9 @@ function setupBossSchedule(client) {
       if (date.participants.includes(userId)) {
         date.participants = date.participants.filter((id) => id !== userId);
       } else {
-        date.participants.push(userId);
-      }
-
-      // 判定
-      if (date.participants.length >= schedule.max && !date.confirmed) {
-        date.confirmed = true;
-        schedule.confirmedDates.push(date.key);
+        if (!date.participants.includes(userId)) {
+          date.participants.push(userId);
+        }
       }
 
       // 全日付を再チェック
@@ -216,7 +207,7 @@ function setupBossSchedule(client) {
 
       await interaction.update({
         content: buildMessage(schedule),
-        components: buildButtons(schedule.dates, schedule, interaction.user.id),
+        components: buildButtons(schedule.dates),
       });
     }
   });
