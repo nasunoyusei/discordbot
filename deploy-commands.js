@@ -14,6 +14,15 @@ const commands = [
             .setDescription('必要人数')
             .setRequired(true)
         )
+        .addStringOption(opt =>
+          opt.setName('開始')
+            .setDescription('開始日')
+            .addChoices(
+              { name: '今日から1週間', value: 'today' },
+              { name: '次の木曜から1週間', value: 'next_thursday' }
+            )
+            .setRequired(true)
+        )
     )
     .addSubcommand(sub =>
       sub
