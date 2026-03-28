@@ -14,7 +14,7 @@ function saveData(data) {
 
 function startScheduler(client) {
   cron.schedule(
-    "40 19 * * *",
+    "0 12 * * *",
     async () => {
       console.log("12時チェック開始");
 
