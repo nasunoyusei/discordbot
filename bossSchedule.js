@@ -37,15 +37,35 @@ function getNext7Days(startDate = new Date()) {
 function buildMessage(data) {
   let text = "📅 ボス参加可能日\n\n";
 
+  const sortedConfirmed = [...data.confirmedDates].sort(
+    (a, b) => new Date(a) - new Date(b),
+  );
+
   for (const d of data.dates) {
     const count = d.participants.length;
     const status = count >= data.max ? "✅" : "❌";
 
     const names = d.participants.map((id) => `<@${id}>`).join(", ");
 
-    text += `${d.label} ${status}（${count}/${data.max}）\n`;
+    // その日が確定リストの何番目か
+    const confirmedIndex = sortedConfirmed.indexOf(d.key);
+
+    // currentIndexより前なら「過去（リスケ済み）」
+    const isPast = confirmedIndex !== -1 && confirmedIndex < data.currentIndex;
+
+    let line = `${d.label} ${status}（${count}/${data.max}）`;
+    if (isPast) {
+      line = `~~${line}~~`;
+    }
+
+    text += line + "\n";
+
     if (names) {
-      text += `　👥 ${names}\n`;
+      let memberLine = `　👥 ${names}`;
+      if (isPast) {
+        memberLine = `~~${memberLine}~~`;
+      }
+      text += memberLine + "\n";
     }
   }
 
@@ -184,11 +204,12 @@ function setupBossSchedule(client) {
             });
           }
 
-          // 次の開催日に進む
+          // ソート
           const sorted = [...schedule.confirmedDates].sort(
             (a, b) => new Date(a) - new Date(b),
           );
 
+          // 次の開催日に進む
           if (schedule.currentIndex + 1 < sorted.length) {
             schedule.currentIndex++;
             schedule.confirmedDates = sorted;
@@ -212,9 +233,18 @@ function setupBossSchedule(client) {
               components: buildButtons(schedule.dates),
             });
 
+            const next = sorted[schedule.currentIndex];
+            const nextObj = schedule.dates.find((d) => d.key === next);
+
+            if (!nextObj) {
+              return interaction.reply({
+                content: "開催日データが見つかりません",
+                ephemeral: true,
+              });
+            }
+
             return interaction.reply({
-              content: "次の開催日に変更しました",
-              ephemeral: true,
+              content: `🐌📢 開催日を変更しました！\n👉 ${nextObj.label}`,
             });
           } else {
             return interaction.reply({
