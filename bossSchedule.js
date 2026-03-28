@@ -252,27 +252,6 @@ function setupBossSchedule(client) {
         .filter((d) => d.participants.length >= schedule.max)
         .map((d) => d.key);
 
-      // 再計算後
-      const sorted = [...schedule.confirmedDates].sort(
-        (a, b) => new Date(a) - new Date(b),
-      );
-
-      const targetDate = sorted[schedule.currentIndex];
-
-      // 今日じゃなくてもOK（テスト用）
-      if (targetDate) {
-        const dateObj = schedule.dates.find((d) => d.key === targetDate);
-
-        if (dateObj && dateObj.participants.length >= schedule.max) {
-          const mentions = dateObj.participants
-            .map((id) => `<@${id}>`)
-            .join(" ");
-
-          // テスト用通知
-          await interaction.channel.send(
-            `🧪【テスト通知】開催日が確定しました！\n${dateObj.label}\n${mentions}`,
-          );
-        }
       }
 
       // currentIndex補正
