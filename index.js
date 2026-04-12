@@ -1,6 +1,9 @@
 const { Client, GatewayIntentBits } = require("discord.js");
 require("dotenv").config();
 
+console.log("TOKEN exists:", !!process.env.TOKEN);
+console.log("TOKEN length:", process.env.TOKEN?.length);
+
 const { startScheduler } = require("./scheduler");
 const { setupRoleHandler } = require("./roleHandler");
 const { setupBossSchedule } = require("./bossSchedule");
