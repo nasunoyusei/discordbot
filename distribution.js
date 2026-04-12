@@ -1,6 +1,9 @@
+console.log("distribution FILE LOADED");
+
 const { Events, EmbedBuilder } = require("discord.js");
 
 function parsePrice(input) {
+  if (!input) return NaN;
   const value = input.toLowerCase().trim();
 
   if (value.endsWith("g")) {

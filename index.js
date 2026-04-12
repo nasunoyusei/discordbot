@@ -18,7 +18,7 @@ const client = new Client({
   ],
 });
 
-client.once("ready", () => {
+client.once("clientReady", () => {
   console.log(`ログイン完了: ${client.user.tag}`);
 
   try {
