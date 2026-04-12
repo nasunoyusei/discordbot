@@ -43,6 +43,7 @@ function setupDistribution(client) {
     }
 
     const price = parsePrice(rawPrice);
+    const displayPrice = rawPrice;
 
     if (isNaN(price) || price <= 0) {
       return interaction.reply({
@@ -83,7 +84,7 @@ function setupDistribution(client) {
         { name: "出品した商品名", value: item, inline: true },
         {
           name: "出品した額",
-          value: `${formatReadable(price)} g`,
+          value: `${displayPrice} メル`,
           inline: true,
         },
         {
