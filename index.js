@@ -15,7 +15,7 @@ const client = new Client({
   ],
 });
 
-client.once("clientReady", () => {
+client.once("ready", () => {
   console.log(`ログイン完了: ${client.user.tag}`);
 
   startScheduler(client);
