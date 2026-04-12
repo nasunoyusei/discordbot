@@ -46,7 +46,16 @@ const commands = [
         .setMinValue(2)
         .setMaxValue(10)
         .setRequired(true),
-    ),
+    )
+    .addUserOption((opt) => opt.setName("user1").setDescription("メンション1"))
+    .addUserOption((opt) => opt.setName("user2").setDescription("メンション2"))
+    .addUserOption((opt) => opt.setName("user3").setDescription("メンション3"))
+    .addUserOption((opt) => opt.setName("user4").setDescription("メンション4"))
+    .addUserOption((opt) => opt.setName("user5").setDescription("メンション5"))
+    .addUserOption((opt) => opt.setName("user6").setDescription("メンション6"))
+    .addUserOption((opt) => opt.setName("user7").setDescription("メンション7"))
+    .addUserOption((opt) => opt.setName("user8").setDescription("メンション8"))
+    .addUserOption((opt) => opt.setName("user9").setDescription("メンション9")),
 ].map((c) => c.toJSON());
 
 const rest = new REST({ version: "10" }).setToken(process.env.TOKEN);

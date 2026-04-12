@@ -43,6 +43,29 @@ function setupDistribution(client) {
       });
     }
 
+    // メンション収集
+    const users = [];
+    for (let i = 1; i <= 9; i++) {
+      const user = interaction.options.getUser(`user${i}`);
+      if (user) users.push(user);
+    }
+
+    const required = members - 1;
+
+    // ❌ チェック
+    if (users.length < required) {
+      return interaction.reply({
+        content: `❌ メンション人数が足りません。\n必要: ${required}人\n現在: ${users.length}人`,
+        ephemeral: true,
+      });
+    }
+
+    const mentions = users
+      .slice(0, required)
+      .map((u) => `<@${u.id}>`)
+      .join(" ");
+
+    // 計算
     const sellPrice = Math.floor((0.97 * price) / (members - 0.03));
     const finalShare = Math.floor(sellPrice * 0.97);
 
@@ -65,10 +88,12 @@ function setupDistribution(client) {
           inline: false,
         },
       )
-      .setColor(0x00ae86)
-      .setFooter({ text: "下の数字をコピーしてそのまま出品できます" });
+      .setColor(0x00ae86);
 
-    await interaction.reply({ embeds: [embed] });
+    await interaction.reply({
+      content: mentions,
+      embeds: [embed],
+    });
   });
 }
 
