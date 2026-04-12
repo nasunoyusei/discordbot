@@ -29,22 +29,20 @@ const commands = [
 
   new SlashCommandBuilder()
     .setName("distribution")
-    .setDescription(
-      "売上メルの均等分配計算 itemには出品物名を、priceには出品額、memberには分配する人数を入れてください。他9を押すとメンションの指定も可能です。",
-    )
+    .setDescription("売上メルの均等分配計算")
     .addStringOption((opt) =>
-      opt.setName("item").setDescription("商品名").setRequired(true),
+      opt.setName("item").setDescription("出品した商品名").setRequired(true),
     )
     .addStringOption((opt) =>
       opt
         .setName("price")
-        .setDescription("30g / 500m / 30000000000")
+        .setDescription("例：30g / 500m / 30000000000")
         .setRequired(true),
     )
     .addIntegerOption((opt) =>
       opt
         .setName("members")
-        .setDescription("PT人数")
+        .setDescription("分配したい人数（2~10人）")
         .setMinValue(2)
         .setMaxValue(10)
         .setRequired(true),
