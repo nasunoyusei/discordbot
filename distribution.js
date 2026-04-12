@@ -21,11 +21,11 @@ function formatG(num) {
 function setupDistribution(client) {
   client.on(Events.InteractionCreate, async (interaction) => {
     if (!interaction.isChatInputCommand()) return;
-    if (interaction.commandName !== "分配") return;
+    if (interaction.commandName !== "distribution") return;
 
-    const item = interaction.options.getString("商品名");
-    const rawPrice = interaction.options.getString("出品金額");
-    const members = interaction.options.getInteger("人数");
+    const item = interaction.options.getString("item");
+    const rawPrice = interaction.options.getString("price");
+    const members = interaction.options.getInteger("members");
 
     if (members < 2 || members > 10) {
       return interaction.reply({
@@ -73,7 +73,7 @@ function setupDistribution(client) {
       .setTitle("💰 メル分配計算")
       .addFields(
         { name: "商品名", value: item, inline: true },
-        { name: "売却額", value: `${formatG(price)} g`, inline: true },
+        { name: "出品額", value: `${formatG(price)} g`, inline: true },
         { name: "PT人数", value: `${members} 人`, inline: true },
 
         {
