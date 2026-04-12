@@ -1,9 +1,6 @@
 const { Client, GatewayIntentBits } = require("discord.js");
 require("dotenv").config();
 
-console.log("TOKEN exists:", !!process.env.TOKEN);
-console.log("TOKEN length:", process.env.TOKEN?.length);
-
 const { startScheduler } = require("./scheduler");
 const { setupRoleHandler } = require("./roleHandler");
 const { setupBossSchedule } = require("./bossSchedule");
@@ -21,35 +18,10 @@ const client = new Client({
 client.once("clientReady", () => {
   console.log(`ログイン完了: ${client.user.tag}`);
 
-  try {
-    startScheduler(client);
-    console.log("scheduler OK");
-  } catch (e) {
-    console.error("scheduler ERROR", e);
-  }
-
-  try {
-    setupRoleHandler(client);
-    console.log("roleHandler OK");
-  } catch (e) {
-    console.error("roleHandler ERROR", e);
-  }
-
-  try {
-    setupBossSchedule(client);
-    console.log("bossSchedule OK");
-  } catch (e) {
-    console.error("bossSchedule ERROR", e);
-  }
-
-  try {
-    setupDistribution(client);
-    console.log("distribution OK");
-  } catch (e) {
-    console.error("distribution ERROR", e);
-  }
-
-  console.log("READY INIT DONE");
+  startScheduler(client);
+  setupRoleHandler(client);
+  setupBossSchedule(client);
+  setupDistribution(client);
 });
 
 client.login(process.env.TOKEN);

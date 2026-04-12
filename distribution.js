@@ -1,5 +1,3 @@
-console.log("distribution FILE LOADED");
-
 const { Events, EmbedBuilder } = require("discord.js");
 
 function parsePrice(input) {
@@ -17,8 +15,15 @@ function parsePrice(input) {
   return parseInt(value.replace(/,/g, ""));
 }
 
-function formatG(num) {
-  return (num / 1_000_000_000).toFixed(2);
+function formatReadable(num) {
+  const g = num / 1_000_000_000;
+
+  if (g >= 1) {
+    return `約${g.toFixed(2)}g`;
+  }
+
+  const m = num / 1_000_000;
+  return `約${m.toFixed(0)}m`;
 }
 
 function setupDistribution(client) {
@@ -75,19 +80,23 @@ function setupDistribution(client) {
     const embed = new EmbedBuilder()
       .setTitle("💰 メル分配計算")
       .addFields(
-        { name: "商品名", value: item, inline: true },
-        { name: "出品額", value: `${formatG(price)} g`, inline: true },
-        { name: "PT人数", value: `${members} 人`, inline: true },
+        { name: "出品した商品名", value: item, inline: true },
+        { name: "出品した額", value: `${formatG(price)} g`, inline: true },
+        {
+          name: "分配する人数（2~10人）",
+          value: `${members} 人`,
+          inline: true,
+        },
 
         {
           name: "各メンバー出品額",
-          value: `**${formatG(sellPrice)} g**\n\`${sellPrice}\``,
+          value: `**${formatReadable(sellPrice)}**\n\`${sellPrice}\``,
           inline: false,
         },
 
         {
           name: "各メンバー受取額",
-          value: `${formatG(finalShare)} g`,
+          value: `**${formatReadable(finalShare)}**\n\`${finalShare}\``,
           inline: false,
         },
       )

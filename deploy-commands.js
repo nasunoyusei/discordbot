@@ -29,7 +29,9 @@ const commands = [
 
   new SlashCommandBuilder()
     .setName("distribution")
-    .setDescription("売上メルの均等分配計算")
+    .setDescription(
+      "売上メルの均等分配計算 itemには出品物名を、priceには出品額、memberには分配する人数を入れてください。他9を押すとメンションの指定も可能です。",
+    )
     .addStringOption((opt) =>
       opt.setName("item").setDescription("商品名").setRequired(true),
     )
@@ -47,15 +49,33 @@ const commands = [
         .setMaxValue(10)
         .setRequired(true),
     )
-    .addUserOption((opt) => opt.setName("user1").setDescription("メンション1"))
-    .addUserOption((opt) => opt.setName("user2").setDescription("メンション2"))
-    .addUserOption((opt) => opt.setName("user3").setDescription("メンション3"))
-    .addUserOption((opt) => opt.setName("user4").setDescription("メンション4"))
-    .addUserOption((opt) => opt.setName("user5").setDescription("メンション5"))
-    .addUserOption((opt) => opt.setName("user6").setDescription("メンション6"))
-    .addUserOption((opt) => opt.setName("user7").setDescription("メンション7"))
-    .addUserOption((opt) => opt.setName("user8").setDescription("メンション8"))
-    .addUserOption((opt) => opt.setName("user9").setDescription("メンション9")),
+    .addUserOption((opt) =>
+      opt.setName("user1").setDescription("分配する人のdiscordの名前1"),
+    )
+    .addUserOption((opt) =>
+      opt.setName("user2").setDescription("分配する人のdiscordの名前2"),
+    )
+    .addUserOption((opt) =>
+      opt.setName("user3").setDescription("分配する人のdiscordの名前3"),
+    )
+    .addUserOption((opt) =>
+      opt.setName("user4").setDescription("分配する人のdiscordの名前4"),
+    )
+    .addUserOption((opt) =>
+      opt.setName("user5").setDescription("分配する人のdiscordの名前5"),
+    )
+    .addUserOption((opt) =>
+      opt.setName("user6").setDescription("分配する人のdiscordの名前6"),
+    )
+    .addUserOption((opt) =>
+      opt.setName("user7").setDescription("分配する人のdiscordの名前7"),
+    )
+    .addUserOption((opt) =>
+      opt.setName("user8").setDescription("分配する人のdiscordの名前8"),
+    )
+    .addUserOption((opt) =>
+      opt.setName("user9").setDescription("分配する人のdiscordの名前9"),
+    ),
 ].map((c) => c.toJSON());
 
 const rest = new REST({ version: "10" }).setToken(process.env.TOKEN);
