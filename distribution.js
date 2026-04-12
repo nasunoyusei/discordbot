@@ -81,7 +81,11 @@ function setupDistribution(client) {
       .setTitle("💰 メル分配計算")
       .addFields(
         { name: "出品した商品名", value: item, inline: true },
-        { name: "出品した額", value: `${formatG(price)} g`, inline: true },
+        {
+          name: "出品した額",
+          value: `${formatReadable(price)} g`,
+          inline: true,
+        },
         {
           name: "分配する人数（2~10人）",
           value: `${members} 人`,
