@@ -2,7 +2,16 @@ const { Events, EmbedBuilder } = require("discord.js");
 
 function parsePrice(input) {
   if (!input) return NaN;
-  const value = input.toLowerCase().trim();
+
+  const value = input
+    .trim()
+    .toLowerCase()
+    .replace(/ｇ/g, "g")
+    .replace(/ｍ/g, "m")
+    .replace(/G/g, "g")
+    .replace(/M/g, "m")
+    .replace(/，/g, ",")
+    .replace(/[０-９]/g, (s) => String.fromCharCode(s.charCodeAt(0) - 65248));
 
   if (value.endsWith("g")) {
     return parseFloat(value.slice(0, -1)) * 1_000_000_000;
