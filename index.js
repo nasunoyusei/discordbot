@@ -24,7 +24,10 @@ client.once("clientReady", () => {
   setupDistribution(client);
 });
 
-client.login(process.env.TOKEN);
+client
+  .login(process.env.TOKEN)
+  .then(() => console.log("Discord login success"))
+  .catch((err) => console.error("Discord login failed:", err));
 
 // UptimeRobotから定期的にアクセスさせてスリープ防止するためのWebサーバー
 const express = require("express");
