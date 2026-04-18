@@ -4,7 +4,7 @@ require("dotenv").config();
 const { startScheduler } = require("./scheduler");
 const { setupRoleHandler } = require("./roleHandler");
 const { setupBossSchedule } = require("./bossSchedule");
-const { setupDistribution } = require("./distribution");
+// const { setupDistribution } = require("./distribution");
 
 const client = new Client({
   intents: [
@@ -17,7 +17,7 @@ const client = new Client({
 
 setupRoleHandler(client);
 setupBossSchedule(client);
-setupDistribution(client);
+// setupDistribution(client);
 
 client.once("ready", () => {
   console.log(`ログイン完了: ${client.user.tag}`);
