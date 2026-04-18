@@ -15,19 +15,19 @@ const client = new Client({
   ],
 });
 
-client.once("clientReady", () => {
-  console.log(`ログイン完了: ${client.user.tag}`);
+setupRoleHandler(client);
+setupBossSchedule(client);
+setupDistribution(client);
 
+client.once("ready", () => {
+  console.log(`ログイン完了: ${client.user.tag}`);
   startScheduler(client);
-  setupRoleHandler(client);
-  setupBossSchedule(client);
-  setupDistribution(client);
 });
 
 client
   .login(process.env.TOKEN)
   .then(() => console.log("Discord login success"))
-  .catch((err) => console.error("Discord login failed:", err));
+  .catch(console.error);
 
 // UptimeRobotから定期的にアクセスさせてスリープ防止するためのWebサーバー
 const express = require("express");
