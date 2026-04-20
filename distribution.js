@@ -69,19 +69,22 @@ function setupDistribution(client) {
     }
 
     const required = members - 1;
+    let mentions = "";
 
-    // ❌ チェック
-    if (users.length < required) {
-      return interaction.reply({
-        content: `❌ メンション人数が足りません。\n必要: ${required}人\n現在: ${users.length}人`,
-        ephemeral: true,
-      });
+    // 1人でも指定された場合だけ人数チェック
+    if (users.length > 0) {
+      if (users.length < required) {
+        return interaction.reply({
+          content: `❌ メンション人数が足りません。\n必要: ${required}人\n現在: ${users.length}人`,
+          ephemeral: true,
+        });
+      }
+
+      mentions = users
+        .slice(0, required)
+        .map((u) => `<@${u.id}>`)
+        .join(" ");
     }
-
-    const mentions = users
-      .slice(0, required)
-      .map((u) => `<@${u.id}>`)
-      .join(" ");
 
     // 計算
     const sellPrice = Math.floor((0.97 * price) / (members - 0.03));
