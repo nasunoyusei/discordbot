@@ -179,7 +179,12 @@ function setupBossSchedule(client) {
         if (sub === "schedule") {
           const max = interaction.options.getInteger("人数");
           const startOption = interaction.options.getString("開始");
-          const allowedUserIds = collectAllowedUserIds(interaction);
+          const allowedUserIds = [
+            ...new Set([
+              ...collectAllowedUserIds(interaction),
+              interaction.user.id,
+            ]),
+          ];
 
           const startDate = getStartDate(startOption);
           const days = getNext7Days(startDate);
