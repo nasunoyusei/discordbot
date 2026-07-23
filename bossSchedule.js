@@ -37,6 +37,12 @@ function getNext7Days(startDate = new Date()) {
 function buildMessage(data) {
   let text = "📅 ボス参加可能日\n\n";
 
+  if (data.allowedUserIds && data.allowedUserIds.length > 0) {
+    const allowedNames = data.allowedUserIds.map((id) => `<@${id}>`).join(", ");
+    text += `🔒 参加対象：${allowedNames}\n`;
+    text += "※参加対象の人のみボタン操作できます。\n\n";
+  }
+
   const sortedConfirmed = [...data.confirmedDates].sort(
     (a, b) => new Date(a) - new Date(b),
   );
@@ -149,6 +155,19 @@ function getStartDate(option) {
   return now;
 }
 
+function collectAllowedUserIds(interaction) {
+  const ids = new Set();
+
+  for (let i = 1; i <= 5; i++) {
+    const user = interaction.options.getUser(`user${i}`);
+    if (user) {
+      ids.add(user.id);
+    }
+  }
+
+  return [...ids];
+}
+
 function setupBossSchedule(client) {
   // Slashコマンド処理
   client.on("interactionCreate", async (interaction) => {
@@ -160,6 +179,7 @@ function setupBossSchedule(client) {
         if (sub === "schedule") {
           const max = interaction.options.getInteger("人数");
           const startOption = interaction.options.getString("開始");
+          const allowedUserIds = collectAllowedUserIds(interaction);
 
           const startDate = getStartDate(startOption);
           const days = getNext7Days(startDate);
@@ -175,6 +195,7 @@ function setupBossSchedule(client) {
             confirmedDates: [],
             currentIndex: 0,
             notified: false,
+            allowedUserIds,
           };
 
           const message = await interaction.reply({
@@ -267,6 +288,18 @@ function setupBossSchedule(client) {
       if (!date) return;
 
       const userId = interaction.user.id;
+      const isAllowed =
+        !schedule.allowedUserIds ||
+        schedule.allowedUserIds.length === 0 ||
+        schedule.allowedUserIds.includes(userId);
+
+      if (!isAllowed) {
+        await interaction.reply({
+          content: "参加対象のメンバーのみ操作できます。",
+          ephemeral: true,
+        });
+        return;
+      }
 
       // トグル
       if (date.participants.includes(userId)) {

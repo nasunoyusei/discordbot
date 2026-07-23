@@ -1,3 +1,4 @@
+// 編集したら node deploy-commands.js で登録する。
 const { REST, Routes, SlashCommandBuilder } = require("discord.js");
 require("dotenv").config();
 
@@ -21,6 +22,21 @@ const commands = [
               { name: "次の木曜から1週間", value: "next_thursday" },
             )
             .setRequired(true),
+        )
+        .addUserOption((opt) =>
+          opt.setName("user1").setDescription("参加可能にする人1"),
+        )
+        .addUserOption((opt) =>
+          opt.setName("user2").setDescription("参加可能にする人2"),
+        )
+        .addUserOption((opt) =>
+          opt.setName("user3").setDescription("参加可能にする人3"),
+        )
+        .addUserOption((opt) =>
+          opt.setName("user4").setDescription("参加可能にする人4"),
+        )
+        .addUserOption((opt) =>
+          opt.setName("user5").setDescription("参加可能にする人5"),
         ),
     )
     .addSubcommand((sub) =>
