@@ -41,8 +41,8 @@ function getNext7Days(startDate = new Date()) {
 }
 
 // 時間帯パース・重なり判定
-const TIME_RANGE_RE =
-  /^\s*([01]?\d|2[0-3]):(00|30)\s*-\s*(?:([01]?\d|2[0-3]):(00|30))?\s*$/;
+const CLOCK_RE = /^([01]?\d|2[0-3]):(00|30)$/;
+const RANGE_SPLIT_RE = /^([^-]*)-([^-]*)$/;
 
 function timeToMinutes(hhmm) {
   const [h, m] = hhmm.split(":").map(Number);
@@ -55,15 +55,56 @@ function minutesToTime(mins) {
   return `${h}:${m}`;
 }
 
-// "17:00-21:00" / "16:30-" をパース。不正なら null
-function parseTimeRange(text) {
-  const m = text.match(TIME_RANGE_RE);
+// 全角数字・全角コロン・波ダッシュ等を半角に補正
+function normalizeTimeText(text) {
+  return text
+    .replace(/[０-９]/g, (c) => String.fromCharCode(c.charCodeAt(0) - 0xfee0))
+    .replace(/[：]/g, ":")
+    .replace(/[〜～ー－―‐−]/g, "-")
+    .replace(/　/g, " ")
+    .trim();
+}
+
+// "17:00" のような単発の時刻をパース。不正なら null
+function parseClockTime(text) {
+  const m = text.match(CLOCK_RE);
+  if (!m) return null;
+  return `${m[1].padStart(2, "0")}:${m[2]}`;
+}
+
+// 「24:00」「0:00」はその日の終わりまでを意味するので、終了なし（null）扱いにする
+function isEndOfDayMarker(text, start) {
+  return (
+    text === "24:00" ||
+    ((text === "0:00" || text === "00:00") && start !== "00:00")
+  );
+}
+
+// "17:00-21:00" / "16:30-" / "-22:00" / 空欄（終日） をパース。不正なら null
+function parseTimeRange(rawText) {
+  const text = normalizeTimeText(rawText);
+
+  if (text === "") {
+    return { start: "00:00", end: null };
+  }
+
+  const m = text.match(RANGE_SPLIT_RE);
   if (!m) return null;
 
-  const start = `${m[1].padStart(2, "0")}:${m[2]}`;
-  const end = m[3] ? `${m[3].padStart(2, "0")}:${m[4]}` : null;
+  const startText = m[1].trim();
+  const endText = m[2].trim();
 
-  if (end !== null && timeToMinutes(start) >= timeToMinutes(end)) return null;
+  // 開始省略（"-22:00"）はその日の始まりから、と同じ扱い
+  const start = startText === "" ? "00:00" : parseClockTime(startText);
+  if (start === null) return null;
+
+  if (endText === "") return { start, end: null };
+
+  if (isEndOfDayMarker(endText, start)) return { start, end: null };
+
+  const end = parseClockTime(endText);
+  if (end === null) return null;
+  if (timeToMinutes(start) >= timeToMinutes(end)) return null;
 
   return { start, end };
 }
@@ -107,12 +148,18 @@ function recomputeConfirmed(schedule) {
   }
 }
 
+function isAllDay(start, end) {
+  return start === "00:00" && end === null;
+}
+
 function formatParticipant(p) {
+  if (isAllDay(p.start, p.end)) return `<@${p.userId}>（終日）`;
   const range = p.end ? `${p.start}-${p.end}` : `${p.start}-`;
   return `<@${p.userId}>（${range}）`;
 }
 
 function formatRange(start, end) {
+  if (isAllDay(start, end)) return "終日";
   return end ? `${start}〜${end}` : `${start}〜`;
 }
 
@@ -124,11 +171,11 @@ function buildTimeModal(dateKey) {
       new ActionRowBuilder().addComponents(
         new TextInputBuilder()
           .setCustomId("time_range_input")
-          .setLabel("時間 (例: 17:00-21:00 / 16:30-)")
+          .setLabel("時間 (空欄なら終日)")
+          .setPlaceholder("17:00-21:00 / 16:30- / -22:00")
           .setStyle(TextInputStyle.Short)
-          .setRequired(true)
-          .setMinLength(4)
-          .setMaxLength(11),
+          .setRequired(false)
+          .setMaxLength(20),
       ),
     );
 }
@@ -485,7 +532,7 @@ function setupBossSchedule(client) {
       if (!parsed) {
         return interaction.reply({
           content:
-            "形式が正しくありません。例: 17:00-21:00 または 16:30-（30分単位で入力してください）",
+            "形式が正しくありません。例: 17:00-21:00 / 16:30- / -22:00 / 空欄=終日（30分単位で入力してください）",
           ephemeral: true,
         });
       }
