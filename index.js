@@ -8,6 +8,7 @@ console.log("CLIENT_ID is set:", !!process.env.CLIENT_ID);
 const { startScheduler } = require("./scheduler");
 const { setupRoleHandler } = require("./roleHandler");
 const { setupBossSchedule } = require("./bossSchedule");
+const { setupBossSymbol } = require("./bossSymbol");
 const { setupDistribution } = require("./distribution");
 
 const client = new Client({
@@ -21,6 +22,7 @@ const client = new Client({
 
 setupRoleHandler(client);
 setupBossSchedule(client);
+setupBossSymbol(client);
 setupDistribution(client);
 
 client.once("ready", () => {

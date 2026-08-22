@@ -2,6 +2,14 @@
 const { REST, Routes, SlashCommandBuilder } = require("discord.js");
 require("dotenv").config();
 
+const bossSymbolData = require("./bossSymbolData.json");
+
+// Discordのchoicesは最大25件。bossSymbolData.jsonに項目を追加するとここにも自動反映される。
+const bossSymbolChoices = bossSymbolData.map((b) => ({
+  name: b.name,
+  value: b.id,
+}));
+
 const commands = [
   new SlashCommandBuilder()
     .setName("boss")
@@ -41,6 +49,18 @@ const commands = [
     )
     .addSubcommand((sub) =>
       sub.setName("reschedule").setDescription("リスケジュール"),
+    )
+    .addSubcommand((sub) =>
+      sub
+        .setName("symbol")
+        .setDescription("ボスの必要シンボル量（フォース）と倍率ダメージ早見表")
+        .addStringOption((opt) =>
+          opt
+            .setName("ボス")
+            .setDescription("ボス名を選択")
+            .addChoices(...bossSymbolChoices)
+            .setRequired(true),
+        ),
     ),
 
   new SlashCommandBuilder()

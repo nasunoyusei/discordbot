@@ -1,0 +1,140 @@
+[
+  {
+    "id": "lucid",
+    "name": "ルシード",
+    "type": "arcane",
+    "verified": true,
+    "requirements": [
+      { "difficulty": "全難易度", "required": 360 }
+    ]
+  },
+  {
+    "id": "will",
+    "name": "ウィル",
+    "type": "arcane",
+    "verified": true,
+    "requirements": [
+      { "difficulty": "イージー", "required": 560 },
+      { "difficulty": "ノーマル/ハード", "required": 760 }
+    ]
+  },
+  {
+    "id": "dusk",
+    "name": "ダスク",
+    "type": "arcane",
+    "verified": true,
+    "requirements": [
+      { "difficulty": "全難易度", "required": 730 }
+    ]
+  },
+  {
+    "id": "true_hilla",
+    "name": "真ヒルラ",
+    "type": "arcane",
+    "verified": true,
+    "requirements": [
+      { "difficulty": "ノーマル", "required": 820 },
+      { "difficulty": "ハード", "required": 900 }
+    ]
+  },
+  {
+    "id": "dunkel",
+    "name": "デュンケル",
+    "type": "arcane",
+    "verified": true,
+    "requirements": [
+      { "difficulty": "全難易度", "required": 850 }
+    ]
+  },
+  {
+    "id": "black_mage",
+    "name": "暗黒の魔法使い",
+    "type": "arcane",
+    "verified": true,
+    "requirements": [
+      { "difficulty": "全難易度", "required": 1320 }
+    ]
+  },
+  {
+    "id": "seren",
+    "name": "選ばれし者セレン",
+    "type": "authentic",
+    "verified": true,
+    "requirements": [
+      { "difficulty": "全難易度", "required": 200 }
+    ]
+  },
+  {
+    "id": "kalos",
+    "name": "監視者カロス",
+    "type": "authentic",
+    "verified": true,
+    "requirements": [
+      { "difficulty": "イージー", "required": 200 },
+      { "difficulty": "ノーマル", "required": 300 },
+      { "difficulty": "カオス", "required": 330 },
+      { "difficulty": "エクストリーム", "required": 440 }
+    ]
+  },
+  {
+    "id": "verus_hilla",
+    "name": "最初の対敵者",
+    "type": "authentic",
+    "verified": true,
+    "requirements": [
+      { "difficulty": "イージー", "required": 220 },
+      { "difficulty": "ノーマル", "required": 320 },
+      { "difficulty": "ハード", "required": 340 },
+      { "difficulty": "エクストリーム", "required": 460 }
+    ]
+  },
+  {
+    "id": "kaling",
+    "name": "カリーン",
+    "type": "authentic",
+    "verified": true,
+    "requirements": [
+      { "difficulty": "イージー", "required": 230 },
+      { "difficulty": "ノーマル", "required": 330 },
+      { "difficulty": "ハード", "required": 350 },
+      { "difficulty": "エクストリーム", "required": 480 }
+    ]
+  },
+  {
+    "id": "malefic_star",
+    "name": "燦爛たる凶星",
+    "type": "authentic",
+    "verified": true,
+    "requirements": [
+      { "difficulty": "ノーマル", "required": 400 },
+      { "difficulty": "ハード", "required": 550 }
+    ]
+  },
+  {
+    "id": "limbo",
+    "name": "リンボ",
+    "type": "authentic",
+    "verified": true,
+    "requirements": [
+      { "difficulty": "全難易度", "required": 500 }
+    ]
+  },
+  {
+    "id": "baldrix",
+    "name": "バルドリックス",
+    "type": "authentic",
+    "verified": true,
+    "requirements": [
+      { "difficulty": "全難易度", "required": 700 }
+    ]
+  },
+  {
+    "id": "jupiter",
+    "name": "ユピテル",
+    "type": "authentic",
+    "verified": true,
+    "requirements": [
+      { "difficulty": "全難易度", "required": 810 }
+    ]
+  }
+]
