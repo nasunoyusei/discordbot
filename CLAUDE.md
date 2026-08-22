@@ -9,6 +9,13 @@ discord.js v14製のDiscord bot。**単一サーバー限定運用**（複数サ
 - スラッシュコマンドの登録: `deploy-commands.js`を編集したら `node deploy-commands.js` を手動実行して反映する（自動反映されない）
 - テストは未整備（package.jsonの`test`はプレースホルダーのみ）
 
+## 改修完了時のフロー
+
+機能追加・修正が終わり、ユーザーから内容OKの確認が取れたら、**都度指示を待たず**に以下を実行する。
+
+1. `deploy-commands.js`に変更がある場合は `node deploy-commands.js` を実行してDiscordへ反映
+2. 変更をコミットしてGitへpush（コミットメッセージは過去のコミット履歴のスタイル・粒度に合わせる）
+
 ## 機密情報の扱い
 
 - `.env` に `TOKEN`（Discord Botトークン）と `CLIENT_ID` を保持。**このファイルの中身は読まない・表示しない**
@@ -20,7 +27,7 @@ discord.js v14製のDiscord bot。**単一サーバー限定運用**（複数サ
 | -------------------- | ----------------------------------------------------------------------------------------------------- |
 | `index.js`           | 起動処理・ログイン。UptimeRobot向けのスリープ防止用Expressサーバーも同居                              |
 | `roleHandler.js`     | 特定チャンネル（`TARGET_CHANNEL_ID`）への発言で自動ロール付与（ロール名はハードコード：「マイマイ」） |
-| `bossSchedule.js`    | `/boss schedule`・`/boss reschedule`。ボタン投票で参加可能日を集計し、`schedule.json`に永続化         |
+| `bossSchedule.js`    | `/boss schedule`・`/boss reschedule`。ボタン投票＋モーダルで参加可能日・時間帯を集計し、`schedule.json`に永続化 |
 | `bossSymbol.js`       | `/boss symbol`。ボス名を選ぶと必要ARC/AUTシンボル量と、110%/130%/150%（ARC）・+10〜+50（AUT）の各しきい値到達時のダメージ早見表を表示 |
 | `bossSymbolData.json` | `bossSymbol.js`が参照するボスごとの必要フォース値データ。`verified:false`の項目はゲーム内アップデートで数値が変わりやすく未検証（`note`に理由を記載）。パッチで変わったら直接編集し、`verified:true`に更新する |
 | `scheduler.js`       | 毎日12:00(JST)にnode-cronで実行。確定日当日なら参加者にメンション通知                                 |
@@ -43,9 +50,11 @@ const finalShare = Math.floor(sellPrice * 0.97);
 ## bossSchedule.js の現状ロジック
 
 1. `/boss schedule` で人数・開始日（今日〜7日 or 次の木曜〜7日）・参加対象者（任意）を指定し、日付ボタンを表示
-2. ボタン押下で参加/不参加をトグル（`interaction.update`で即時反映）
-3. 参加人数が指定人数に達した日を`confirmedDates`へ自動追加
-4. `currentIndex`が「次回開催日」を指す。`/boss reschedule`で次の候補日へ手動送り
+2. 未登録の日付ボタンを押すと時間帯入力モーダル（`17:00-21:00` / `16:30-`のような自由記述、30分単位）を表示。登録済みの日付ボタンを押すとモーダルなしで即時に登録解除（トグルオフ）
+3. `date.participants`は`{userId, start, end}`の配列（`end: null`は開始のみのopen-ended）
+4. `recomputeConfirmed()`が全日付を再計算：「参加人数が指定人数に達し」かつ「全員の時間帯（`latestStart`〜`earliestEnd`）が重なる」日を`confirmedDates`へ追加し、その日の`confirmedStart`/`confirmedEnd`に確定時間帯を保存。人数は揃ったが時間が重ならない日は⚠️表示で区別（❌未達 / ⚠️人数達成だが時間未調整 / ✅確定の3状態）
+5. `currentIndex`が「次回開催日」を指す。`/boss reschedule`で次の候補日へ手動送り
+6. `scheduler.js`の通知タイミングは変更なし（毎日12:00固定）。通知本文に`confirmedStart`/`confirmedEnd`を追記するのみ
 
 ## bossSymbol.js の仕様（要求フォース超過ボーナスの計算根拠）
 
@@ -57,22 +66,3 @@ Nexon公式ガイド（https://maplestory.nexon.co.jp/gameguide/growth/force/ �
 `bossSymbolData.json`の`requirements[].required`が「その難易度の要求フォース値（=100%地点）」。`bossSymbol.js`はここから110/130/150%（ARC）または+10〜+50（AUT）の実値を計算して表示する。
 
 **データの信頼性に注意**：全14体とも`verified:true`（2026-08-22にユーザーがゲーム内で確認・修正済み）。ただしユピテル・燦爛たる凶星は2026年7〜8月のCROWNアップデートで実装されたばかりの新ボスで、パッチによる数値変動リスクが特に高い。今後のアップデートで要求フォース値が変わった場合は`required`値を直接修正すること（`verified`は運用上そのまま`true`でよいが、大きな変更があれば一時的に`false`に戻して再検証を促す運用も検討）。
-
-## 進行中のアップデート：時間指定機能（未実装）
-
-**要件**：日付だけでなく「その日の何時〜何時なら参加できるか」も入力させ、**全員の空き時間が重なる日時**を開催日時として確定する（確定ロジックの根本方針は変更なし）。
-
-**想定変更点**
-
-- データ構造: `date.participants`（IDの配列）→ `{userId, start, end}` の配列へ
-- 参加登録UI: 日付ボタン押下後、時間帯入力用のモーダル（ポップアップ）表示を検討中
-- 確定ロジック: 「人数が揃った日」→「人数が揃い、かつ全員の時間帯に重なりがある日」に変更
-- `scheduler.js`: 確定時刻に合わせた通知タイミング調整が必要になる可能性あり
-
-**未決定事項（実装前にユーザーへ確認すること）**
-
-1. 時間帯の入力方法：モーダルへのテキスト入力（例「19:00-22:00」）か、開始・終了のプルダウン選択か
-2. 時間の刻み単位：30分区切り or 1時間区切り
-3. 1人が1日に指定できる時間帯は1つのみか、複数候補（例：19-21時 or 22-24時）を許容するか
-
-上記が未回答のまま実装を進めない。

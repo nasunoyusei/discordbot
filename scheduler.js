@@ -41,13 +41,20 @@ function startScheduler(client) {
         const dateObj = schedule.dates.find((d) => d.key === targetDate);
         if (!dateObj || dateObj.participants.length === 0) continue;
 
-        const mentions = dateObj.participants.map((id) => `<@${id}>`).join(" ");
+        const mentions = dateObj.participants
+          .map((p) => `<@${p.userId}>`)
+          .join(" ");
+        const timeText = dateObj.confirmedStart
+          ? dateObj.confirmedEnd
+            ? `（${dateObj.confirmedStart}〜${dateObj.confirmedEnd}）`
+            : `（${dateObj.confirmedStart}〜）`
+          : "";
 
         try {
           const channel = await client.channels.fetch(schedule.channelId);
           if (!channel) continue;
 
-          await channel.send(`🐌📢 今日はボスの日です！\n${mentions}`);
+          await channel.send(`🐌📢 今日はボスの日です！${timeText}\n${mentions}`);
 
           schedule.notified = true;
 
