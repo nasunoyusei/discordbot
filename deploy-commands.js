@@ -110,6 +110,16 @@ const commands = [
     .addUserOption((opt) =>
       opt.setName("user9").setDescription("分配する人のdiscordの名前9"),
     ),
+  new SlashCommandBuilder()
+    .setName("gather")
+    .setDescription("全VCの接続者を、自分のいるVC（またはこのVCチャット）に集める")
+    .addIntegerOption((opt) =>
+      opt
+        .setName("秒数")
+        .setDescription("移動までのカウントダウン秒数（3~60秒、省略時10秒）")
+        .setMinValue(3)
+        .setMaxValue(60),
+    ),
 ].map((c) => c.toJSON());
 
 const rest = new REST({ version: "10" }).setToken(process.env.TOKEN);

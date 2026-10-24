@@ -32,6 +32,7 @@ discord.js v14製のDiscord bot。**単一サーバー限定運用**（複数サ
 | `bossSymbolData.json` | `bossSymbol.js`が参照するボスごとの必要フォース値データ。`verified:false`の項目はゲーム内アップデートで数値が変わりやすく未検証（`note`に理由を記載）。パッチで変わったら直接編集し、`verified:true`に更新する |
 | `scheduler.js`       | 毎日12:00(JST)にnode-cronで実行。確定日当日なら参加者にメンション通知                                 |
 | `distribution.js`    | `/distribution`。売上（ゲーム内通貨「メル」）を人数で均等分配する計算                                 |
+| `gather.js`          | `/gather`。全VC接続者を実行者のいるVC（VCチャット欄で実行した場合はそのVC）へ移動。各VCのチャット欄にカウントダウン通知（3〜60秒、既定10秒）とキャンセルボタン。実行は「副マス」以上のロールか管理者のみ。Bot・サーバー設定のAFKチャンネル・`EXCLUDED_CHANNEL_NAMES`（「おやすみな"さい"」）は除外。`GuildVoiceStates` intentが必要 |
 | `deploy-commands.js` | スラッシュコマンド定義をDiscord APIへ登録                                                             |
 
 ## distribution.js の設計意図（重要・再実装時に忘れないこと）

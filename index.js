@@ -10,6 +10,7 @@ const { setupRoleHandler } = require("./roleHandler");
 const { setupBossSchedule } = require("./bossSchedule");
 const { setupBossSymbol } = require("./bossSymbol");
 const { setupDistribution } = require("./distribution");
+const { setupGather } = require("./gather");
 
 const client = new Client({
   intents: [
@@ -17,6 +18,7 @@ const client = new Client({
     GatewayIntentBits.GuildMessages,
     GatewayIntentBits.MessageContent,
     GatewayIntentBits.GuildMembers,
+    GatewayIntentBits.GuildVoiceStates,
   ],
 });
 
@@ -24,6 +26,7 @@ setupRoleHandler(client);
 setupBossSchedule(client);
 setupBossSymbol(client);
 setupDistribution(client);
+setupGather(client);
 
 client.once("ready", () => {
   console.log(`ログイン完了: ${client.user.tag}`);
