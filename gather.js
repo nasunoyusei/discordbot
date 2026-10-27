@@ -5,6 +5,7 @@ const {
   ButtonBuilder,
   ButtonStyle,
   ComponentType,
+  MessageFlags,
 } = require("discord.js");
 
 // このロール以上（ロール一覧でこれと同じか上の位置）を持つ人だけ実行できる。管理者は常に可。
@@ -57,7 +58,7 @@ function setupGather(client) {
     if (!canExecute(member)) {
       return interaction.reply({
         content: `このコマンドは「${MIN_ROLE_NAME}」以上のロールを持つ人だけが使えます。`,
-        ephemeral: true,
+        flags: MessageFlags.Ephemeral,
       });
     }
 
@@ -69,7 +70,7 @@ function setupGather(client) {
     if (!target) {
       return interaction.reply({
         content: "移動先のVCがわかりません。VCに入るか、VCのチャット欄で実行してください。",
-        ephemeral: true,
+        flags: MessageFlags.Ephemeral,
       });
     }
 
@@ -78,14 +79,14 @@ function setupGather(client) {
     if (!perms?.has([PermissionFlagsBits.MoveMembers, PermissionFlagsBits.Connect])) {
       return interaction.reply({
         content: `Botに 🔊${target.name} への「メンバーを移動」「接続」権限がありません。`,
-        ephemeral: true,
+        flags: MessageFlags.Ephemeral,
       });
     }
 
     if (running) {
       return interaction.reply({
         content: "別の集合処理が実行中です。終わってから再実行してください。",
-        ephemeral: true,
+        flags: MessageFlags.Ephemeral,
       });
     }
 
@@ -93,7 +94,7 @@ function setupGather(client) {
     if (initialTargets.size === 0) {
       return interaction.reply({
         content: `🔊${target.name} 以外のVCに誰もいません。`,
-        ephemeral: true,
+        flags: MessageFlags.Ephemeral,
       });
     }
 
@@ -110,12 +111,12 @@ function setupGather(client) {
           .setStyle(ButtonStyle.Danger),
       );
 
-      const replyMsg = await interaction.reply({
+      const response = await interaction.reply({
         content:
           `📢 ${initialTargets.size}人を 🔊**${target.name}** に集めます（<t:${moveAt}:R>）\n` +
           "キャンセルする場合は下のボタンを押してください。",
         components: [row],
-        fetchReply: true,
+        withResponse: true,
       });
 
       // 移動元の各VCのチャット欄にカウントダウンを投稿
@@ -146,13 +147,13 @@ function setupGather(client) {
       // カウントダウン中のキャンセル待ち（実行可能な人なら誰でも押せる）
       let cancelledBy = null;
       try {
-        const btn = await replyMsg.awaitMessageComponent({
+        const btn = await response.resource.message.awaitMessageComponent({
           componentType: ComponentType.Button,
           time: seconds * 1000,
           filter: async (i) => {
             if (i.customId !== cancelId) return false;
             if (canExecute(i.member)) return true;
-            await i.reply({ content: "キャンセル権限がありません。", ephemeral: true });
+            await i.reply({ content: "キャンセル権限がありません。", flags: MessageFlags.Ephemeral });
             return false;
           },
         });

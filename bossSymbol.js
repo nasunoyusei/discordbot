@@ -1,4 +1,4 @@
-const { Events, EmbedBuilder } = require("discord.js");
+const { Events, EmbedBuilder, MessageFlags } = require("discord.js");
 const fs = require("fs");
 const path = require("path");
 
@@ -88,7 +88,7 @@ function setupBossSymbol(client) {
     } catch (e) {
       return interaction.reply({
         content: "シンボルデータの読み込みに失敗しました。",
-        ephemeral: true,
+        flags: MessageFlags.Ephemeral,
       });
     }
 
@@ -97,7 +97,7 @@ function setupBossSymbol(client) {
     if (!boss) {
       return interaction.reply({
         content: "該当するボスが見つかりません。",
-        ephemeral: true,
+        flags: MessageFlags.Ephemeral,
       });
     }
 

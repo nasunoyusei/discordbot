@@ -1,4 +1,4 @@
-const { Client, GatewayIntentBits } = require("discord.js");
+const { Client, Events, GatewayIntentBits } = require("discord.js");
 require("dotenv").config();
 
 // デバッグ：環境変数確認
@@ -28,7 +28,7 @@ setupBossSymbol(client);
 setupDistribution(client);
 setupGather(client);
 
-client.once("ready", () => {
+client.once(Events.ClientReady, () => {
   console.log(`ログイン完了: ${client.user.tag}`);
   startScheduler(client);
 });

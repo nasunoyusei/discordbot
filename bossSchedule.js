@@ -5,6 +5,7 @@ const {
   ModalBuilder,
   TextInputBuilder,
   TextInputStyle,
+  MessageFlags,
 } = require("discord.js");
 const fs = require("fs");
 
@@ -387,7 +388,7 @@ function setupBossSchedule(client) {
           if (!schedule) {
             return interaction.reply({
               content: "スケジュールが存在しません",
-              ephemeral: true,
+              flags: MessageFlags.Ephemeral,
             });
           }
 
@@ -411,7 +412,7 @@ function setupBossSchedule(client) {
             } catch (e) {
               return interaction.reply({
                 content: "元メッセージが見つかりません",
-                ephemeral: true,
+                flags: MessageFlags.Ephemeral,
               });
             }
 
@@ -426,7 +427,7 @@ function setupBossSchedule(client) {
             if (!nextObj) {
               return interaction.reply({
                 content: "開催日データが見つかりません",
-                ephemeral: true,
+                flags: MessageFlags.Ephemeral,
               });
             }
 
@@ -436,7 +437,7 @@ function setupBossSchedule(client) {
           } else {
             return interaction.reply({
               content: "これ以上先の候補日がありません",
-              ephemeral: true,
+              flags: MessageFlags.Ephemeral,
             });
           }
         }
@@ -462,7 +463,7 @@ function setupBossSchedule(client) {
       if (!isAllowed) {
         await interaction.reply({
           content: "参加対象のメンバーのみ操作できます。",
-          ephemeral: true,
+          flags: MessageFlags.Ephemeral,
         });
         return;
       }
@@ -501,7 +502,7 @@ function setupBossSchedule(client) {
       if (!schedule) {
         return interaction.reply({
           content: "スケジュールが存在しません",
-          ephemeral: true,
+          flags: MessageFlags.Ephemeral,
         });
       }
 
@@ -509,7 +510,7 @@ function setupBossSchedule(client) {
       if (!date) {
         return interaction.reply({
           content: "開催日データが見つかりません",
-          ephemeral: true,
+          flags: MessageFlags.Ephemeral,
         });
       }
 
@@ -522,7 +523,7 @@ function setupBossSchedule(client) {
       if (!isAllowed) {
         return interaction.reply({
           content: "参加対象のメンバーのみ操作できます。",
-          ephemeral: true,
+          flags: MessageFlags.Ephemeral,
         });
       }
 
@@ -533,7 +534,7 @@ function setupBossSchedule(client) {
         return interaction.reply({
           content:
             "形式が正しくありません。例: 17:00-21:00 / 16:30- / -22:00 / 空欄=終日（30分単位で入力してください）",
-          ephemeral: true,
+          flags: MessageFlags.Ephemeral,
         });
       }
 
@@ -554,7 +555,7 @@ function setupBossSchedule(client) {
           components: buildButtons(schedule.dates),
         });
       } else {
-        await interaction.reply({ content: "登録しました", ephemeral: true });
+        await interaction.reply({ content: "登録しました", flags: MessageFlags.Ephemeral });
       }
     }
   });

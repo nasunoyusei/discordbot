@@ -1,4 +1,4 @@
-const { Events, EmbedBuilder } = require("discord.js");
+const { Events, EmbedBuilder, MessageFlags } = require("discord.js");
 
 function parsePrice(input) {
   if (!input) return NaN;
@@ -47,7 +47,7 @@ function setupDistribution(client) {
     if (members < 2 || members > 10) {
       return interaction.reply({
         content: "PT人数は2～10人で入力してください。",
-        ephemeral: true,
+        flags: MessageFlags.Ephemeral,
       });
     }
 
@@ -57,7 +57,7 @@ function setupDistribution(client) {
     if (isNaN(price) || price <= 0) {
       return interaction.reply({
         content: "金額の形式が正しくありません。",
-        ephemeral: true,
+        flags: MessageFlags.Ephemeral,
       });
     }
 
@@ -76,7 +76,7 @@ function setupDistribution(client) {
       if (users.length < required) {
         return interaction.reply({
           content: `❌ メンション人数が足りません。\n必要: ${required}人\n現在: ${users.length}人`,
-          ephemeral: true,
+          flags: MessageFlags.Ephemeral,
         });
       }
 
